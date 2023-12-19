@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 import cv2
 import mediapipe as mp
 import rclpy
@@ -10,8 +12,7 @@ class CameraSubscriber(Node):
     def __init__(self):
         super().__init__('camera_subscriber_node')
         self.bridge = CvBridge()
-        self.subscription = self.create_subscription(
-            Image,'/kinect_camera/image_raw', self.image_callback, 10)
+        self.subscription = self.create_subscription(Image,'/kinect_camera/image_raw', self.image_callback, 10)
         self.cv_image=None
     
     #take webcam feed and display 
