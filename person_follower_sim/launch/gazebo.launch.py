@@ -15,7 +15,7 @@ def generate_launch_description():
     #path to xacro file
     xacro_file=get_package_share_directory('person_follower_sim')+'/urdf/mr_robot.xacro'
     my_pkg_dir = join(get_package_share_directory('person_follower_sim'), 'worlds', 'model.sdf')
-    actor_world = join(get_package_share_directory("person_follower_sim"),'worlds','walk.world')
+    actor_world = join(get_package_share_directory("person_follower_sim"),'worlds','stand.world')
     # Include the gazebo.launch.py file
     gazebo=IncludeLaunchDescription(
         PythonLaunchDescriptionSource([get_package_share_directory('gazebo_ros'), '/launch/gazebo.launch.py']),
@@ -51,9 +51,10 @@ def generate_launch_description():
         arguments=[
     '-entity', 'mr_robot',
     '-topic', '/robot_description',
-    '-x', '2.0',  # Set the initial X position
-    '-y', '0.0',  # Set the initial Y position
-    '-z', '0.0'   # Set the initial Z position
+    '-x', '6.0',  # Set the initial X position
+    '-y', '2.0',  # Set the initial Y position
+    '-z', '0.0' ,  # Set the initial Z position
+    '-Y', '-3.14'   # Set the initial Z position
 ]
     )
     return LaunchDescription([
