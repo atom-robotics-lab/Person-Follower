@@ -23,6 +23,7 @@ class PersonFollower(Node):
             min_detection_confidence=0.5,
             min_tracking_confidence=0.5
         )
+        self.mp_drawing = mp.solutions.drawing_utils
         
     def depth_callback(self,data):
        try:
@@ -52,6 +53,7 @@ class PersonFollower(Node):
             if self.depth_image is not None:
                 depth_mm = self.depth_image[int(self.y_center),int(self.x_center)]
                 print("depth is :",depth_mm)
+            
 
             cv2.circle(self.cv_image, (int(x_centroid * self.cv_image.shape[1]), int(y_centroid * self.cv_image.shape[0])), 5, (0, 0, 255), -1)
 
@@ -62,15 +64,38 @@ class PersonFollower(Node):
 
             cv2.rectangle(self.cv_image, (int(x_min * self.cv_image.shape[1]), int(y_min * self.cv_image.shape[0])),
                           (int(x_max * self.cv_image.shape[1]), int(y_max * self.cv_image.shape[0])), (0, 255, 0), 2)
+            self.mp_drawing.draw_landmarks(self.cv_image, self.results.pose_landmarks)
             cv2.imshow('Person Detection', self.cv_image)
+
+
             cv2.waitKey(3)
             print("Person detected in the image")
+            #self.move_robot(self.x_center,self.y_center)
+            print("x_centroid=", self.x_center)
+            print("y_centroid=", self.y_center)
             
         else:
             cv2.imshow('Person Detection', self.cv_image)
             cv2.waitKey(3)
             print("No person detected in the image")
              
+
+
+    # def move_robot(self, x_centroid, y_centroid):
+    #     # Assuming your robot moves forward/backward based on x-axis and turns based on y-axis
+    #     linear_speed = 0.1  # Adjust the linear speed as needed
+    #     angular_speed = 0.1  # Adjust the angular speed as needed
+
+    #     x_error = x_centroid - 350  # Calculate the error from the center (assuming 0.5 is the desired center)
+    #     y_error = y_centroid - 0.5   #Calculate the error from the center (assuming 0.5 is the desired center)
+
+    #     # Generate Twist message for robot movement
+    #     twist_msg = Twist()
+    #     twist_msg.linear.x = linear_speed * x_error
+    #     twist_msg.angular.z = angular_speed * y_error
+
+    #     # Publish the Twist message
+    #     self.velocity_publisher.publish(twist_msg)
 
 def main():
   rclpy.init()
