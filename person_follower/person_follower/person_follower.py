@@ -15,6 +15,8 @@ class PersonFollower(Node):
         self.bridge = CvBridge() 
         self.image_sub = self.create_subscription(Image, "/kinect_camera/image_raw",self.callback, 10) 
         self.depth_sub=self.create_subscription(Image,"/kinect_camera/depth/image_raw",self.depth_callback,10)
+        self.velocity_publisher = self.create_publisher(Twist, "/cmd_vel", 10)
+        
         self.velocity_msg = Twist() 
         self.depth_image = None  
     
@@ -51,8 +53,8 @@ class PersonFollower(Node):
 
             x =int(x_length/2)
             if self.depth_image is not None:
-                depth_mm = self.depth_image[int(self.y_center),int(self.x_center)]
-                print("depth is :",depth_mm)
+                self.depth_mm = self.depth_image[int(self.y_center),int(self.x_center)]
+                print("depth is :",self.depth_mm)
             
 
             cv2.circle(self.cv_image, (int(x_centroid * self.cv_image.shape[1]), int(y_centroid * self.cv_image.shape[0])), 5, (0, 0, 255), -1)
@@ -70,7 +72,7 @@ class PersonFollower(Node):
 
             cv2.waitKey(3)
             print("Person detected in the image")
-            #self.move_robot(self.x_center,self.y_center)
+            self.move_robot(self.x_center,self.y_center)
             print("x_centroid=", self.x_center)
             print("y_centroid=", self.y_center)
             
@@ -81,21 +83,24 @@ class PersonFollower(Node):
              
 
 
-    # def move_robot(self, x_centroid, y_centroid):
-    #     # Assuming your robot moves forward/backward based on x-axis and turns based on y-axis
-    #     linear_speed = 0.1  # Adjust the linear speed as needed
-    #     angular_speed = 0.1  # Adjust the angular speed as needed
+    def move_robot(self, x_centroid, y_centroid):
+        # Assuming your robot moves forward/backward based on x-axis and turns based on y-axis
+        Kp_l = 0.09  # Kp
+        Kp_a= 0.002  # Kp
 
-    #     x_error = x_centroid - 350  # Calculate the error from the center (assuming 0.5 is the desired center)
-    #     y_error = y_centroid - 0.5   #Calculate the error from the center (assuming 0.5 is the desired center)
+        x_error = self.x_center - 350  # Calculate the error from the centroid of hooman
+        
 
-    #     # Generate Twist message for robot movement
-    #     twist_msg = Twist()
-    #     twist_msg.linear.x = linear_speed * x_error
-    #     twist_msg.angular.z = angular_speed * y_error
+        if self.depth_image is not None:
+                self.depth_mm = self.depth_image[int(self.y_center),int(self.x_center)]
+                
+                # Generate Twist message for robot movement
+                twist_msg = Twist()
+                twist_msg.linear.x = Kp_l * self.depth_mm
+                twist_msg.angular.z = -(Kp_a * x_error)
 
-    #     # Publish the Twist message
-    #     self.velocity_publisher.publish(twist_msg)
+                # Publish the Twist message
+                self.velocity_publisher.publish(twist_msg)
 
 def main():
   rclpy.init()

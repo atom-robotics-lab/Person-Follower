@@ -52,7 +52,7 @@ def generate_launch_description():
     '-entity', 'mr_robot',
     '-topic', '/robot_description',
     '-x', '6.0',  # Set the initial X position
-    '-y', '2.0',  # Set the initial Y position
+    '-y', '-2.0',  # Set the initial Y position
     '-z', '0.0' ,  # Set the initial Z position
     '-Y', '-3.14'   # Set the initial Z position
 ]
