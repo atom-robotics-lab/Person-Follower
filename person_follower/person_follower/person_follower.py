@@ -51,10 +51,13 @@ class PersonFollower(Node):
             x_length=self.cv_image.shape[1]
             self.image_center=x_length/2
 
-            x =int(x_length/2)
+            
             if self.depth_image is not None:
                 self.depth_mm = self.depth_image[int(self.y_center),int(self.x_center)]
                 print("depth is :",self.depth_mm)
+                
+            else:
+                self.depth_mm = 0    
             
 
             cv2.circle(self.cv_image, (int(x_centroid * self.cv_image.shape[1]), int(y_centroid * self.cv_image.shape[0])), 5, (0, 0, 255), -1)
@@ -88,19 +91,26 @@ class PersonFollower(Node):
         Kp_l = 0.09  # Kp
         Kp_a= 0.002  # Kp
 
-        x_error = self.x_center - 350  # Calculate the error from the centroid of hooman
         
+        twist_msg = Twist()
 
-        if self.depth_image is not None:
-                self.depth_mm = self.depth_image[int(self.y_center),int(self.x_center)]
+        if self.depth_mm >= 1.4 :
+            x_error = self.x_center - self.image_center  # Calculate the error from the centroid of hooman
+            self.depth_mm = self.depth_image[int(self.y_center),int(self.x_center)]
                 
-                # Generate Twist message for robot movement
-                twist_msg = Twist()
-                twist_msg.linear.x = Kp_l * self.depth_mm
-                twist_msg.angular.z = -(Kp_a * x_error)
+            # Generate Twist message for robot movement
+            
+            P_x = Kp_l * self.depth_mm
+            
+            twist_msg.linear.x = P_x
 
-                # Publish the Twist message
-                self.velocity_publisher.publish(twist_msg)
+            P_a = -(Kp_a * x_error)
+            twist_msg.angular.z = P_a
+        else:
+            twist_msg.linear.x = 0
+        # Publish the Twist message
+        self.velocity_publisher.publish(twist_msg)
+
 
 def main():
   rclpy.init()
