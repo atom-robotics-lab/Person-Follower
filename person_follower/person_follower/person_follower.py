@@ -55,7 +55,9 @@ class PersonFollower(Node):
             if self.depth_image is not None:
                 self.depth_mm = self.depth_image[int(self.y_center),int(self.x_center)]
                 print("depth is :",self.depth_mm)
-                
+                self.move_robot(self.x_center,self.y_center)
+
+
             else:
                 self.depth_mm = 0    
             
@@ -75,7 +77,7 @@ class PersonFollower(Node):
 
             cv2.waitKey(3)
             print("Person detected in the image")
-            self.move_robot(self.x_center,self.y_center)
+            #self.move_robot(self.x_center,self.y_center)
             print("x_centroid=", self.x_center)
             print("y_centroid=", self.y_center)
             
@@ -88,26 +90,28 @@ class PersonFollower(Node):
 
     def move_robot(self, x_centroid, y_centroid):
         # Assuming your robot moves forward/backward based on x-axis and turns based on y-axis
-        Kp_l = 0.09  # Kp
-        Kp_a= 0.002  # Kp
+        Kp_l = 0.099  # Kp
+        Kp_yaw= 0.002  # Kp
 
         
         twist_msg = Twist()
 
-        if self.depth_mm >= 1.4 :
+        if self.depth_mm > 1.5 :
             x_error = self.x_center - self.image_center  # Calculate the error from the centroid of hooman
             self.depth_mm = self.depth_image[int(self.y_center),int(self.x_center)]
                 
             # Generate Twist message for robot movement
             
             P_x = Kp_l * self.depth_mm
-            
             twist_msg.linear.x = P_x
 
-            P_a = -(Kp_a * x_error)
-            twist_msg.angular.z = P_a
+            P_yaw = -(Kp_yaw * x_error)
+            twist_msg.angular.z = P_yaw
+    
         else:
-            twist_msg.linear.x = 0
+            twist_msg.linear.x = 0.0
+            
+            
         # Publish the Twist message
         self.velocity_publisher.publish(twist_msg)
 
