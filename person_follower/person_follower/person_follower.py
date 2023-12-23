@@ -16,10 +16,11 @@ class PersonFollower(Node):
         self.image_sub = self.create_subscription(Image, "/kinect_camera/image_raw",self.callback, 10) 
         self.depth_sub=self.create_subscription(Image,"/kinect_camera/depth/image_raw",self.depth_callback,10)
         self.velocity_publisher = self.create_publisher(Twist, "/cmd_vel", 10)
-        
+        self.last_error = 0.0
+        self.last_depth = 0.0
         self.velocity_msg = Twist() 
-        self.depth_image = None  
-    
+        self.depth_image = None
+        
 
         self.mp_pose = mp.solutions.pose.Pose(
             min_detection_confidence=0.5,
@@ -56,9 +57,15 @@ class PersonFollower(Node):
             if self.depth_image is not None:
                 self.depth_mm = self.depth_image[int(self.y_center),int(self.x_center)]
                 print("depth is :",self.depth_mm)
+<<<<<<< HEAD
                 print("Person detected in the image")
                 self.move_robot(self.x_center,self.y_center)
                 
+=======
+                self.move_robot(self.x_center,self.y_center)
+
+
+>>>>>>> 92f32b95a65c97876e2e09733a415d354df56cd9
             else:
                 self.depth_mm = 0    
             
@@ -77,36 +84,79 @@ class PersonFollower(Node):
 
 
             cv2.waitKey(3)
+<<<<<<< HEAD
             
+=======
+            print("Person detected in the image")
+            #self.move_robot(self.x_center,self.y_center)
+>>>>>>> 92f32b95a65c97876e2e09733a415d354df56cd9
             print("x_centroid=", self.x_center)
             print("y_centroid=", self.y_center)
             
         else:
+            twist_msg = Twist()
+            
             cv2.imshow('Person Detection', self.cv_image)
             cv2.waitKey(3)
             print("No person detected in the image")
+<<<<<<< HEAD
+=======
+            # twist_msg.angular.z = 1.0
+            # twist_msg.linear.x = 0.0
+            # self.velocity_publisher.publish(twist_msg) 
+>>>>>>> 92f32b95a65c97876e2e09733a415d354df56cd9
 
 # prev_time= time.now();
     
 
     def move_robot(self, x_centroid, y_centroid):
+<<<<<<< HEAD
         # Assuming your robot moves forward/backward based on x-axis and turns based on y-axis
         Kp_l = 0.09  # Kp
         Kp_a= 0.002  # Kp
         Kd_a=0.005     #Kd
+=======
+>>>>>>> 92f32b95a65c97876e2e09733a415d354df56cd9
         
+        Kp_l = 0.7  # Kp
+        Kp_yaw= 0.0073  # Kp
+
+        Kd_yaw = 0.00002 #Kd
+        Kd_l = 0.25
         twist_msg = Twist()
 
-        if self.depth_mm >= 1.4 :
+
+        if self.depth_mm > 1.5 :
+            #current_time = rclpy.time()
+
             x_error = self.x_center - self.image_center  # Calculate the error from the centroid of hooman
             self.depth_mm = self.depth_image[int(self.y_center),int(self.x_center)]
+<<<<<<< HEAD
                
             # Generate Twist message for robot movement
+=======
+>>>>>>> 92f32b95a65c97876e2e09733a415d354df56cd9
             
+            #dt = current_time - prev_time
+                
+            # Proportional Drive
             P_x = Kp_l * self.depth_mm
             
-            twist_msg.linear.x = P_x
+            P_yaw = -(Kp_yaw * x_error)
 
+            # Derivative Drive
+            D_yaw =  ((x_error - self.last_error) / 0.6) * Kd_yaw
+            D_l = ((self.depth_mm - self.last_depth) / 0.6) * Kd_l
+
+
+            self.last_depth = self.depth_mm
+            self.last_error = x_error
+
+            #Publishing twist message
+            twist_msg.angular.z = P_yaw + D_yaw
+            twist_msg.linear.x = P_x + D_l
+
+<<<<<<< HEAD
             P_a = -(Kp_a * x_error)
             
             D_a=(x_error - self.prev_error)*Kd_a
@@ -115,6 +165,12 @@ class PersonFollower(Node):
             self.prev_error=x_error
         else:
             twist_msg.linear.x = 0.0
+=======
+        else:
+            twist_msg.linear.x = 0.0
+            twist_msg.angular.z = 0.0
+            
+>>>>>>> 92f32b95a65c97876e2e09733a415d354df56cd9
         # Publish the Twist message
         self.velocity_publisher.publish(twist_msg)
 
