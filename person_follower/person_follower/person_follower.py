@@ -7,7 +7,7 @@ from cv_bridge import CvBridge, CvBridgeError
 import cv2
 from sensor_msgs.msg import Image
 import mediapipe as mp
-
+import time
 
 class PersonFollower(Node):
     def __init__(self):
@@ -26,6 +26,7 @@ class PersonFollower(Node):
             min_tracking_confidence=0.5
         )
         self.mp_drawing = mp.solutions.drawing_utils
+        self.prev_error=0
         
     def depth_callback(self,data):
        try:
@@ -55,6 +56,8 @@ class PersonFollower(Node):
             if self.depth_image is not None:
                 self.depth_mm = self.depth_image[int(self.y_center),int(self.x_center)]
                 print("depth is :",self.depth_mm)
+                print("Person detected in the image")
+                self.move_robot(self.x_center,self.y_center)
                 
             else:
                 self.depth_mm = 0    
@@ -74,8 +77,7 @@ class PersonFollower(Node):
 
 
             cv2.waitKey(3)
-            print("Person detected in the image")
-            self.move_robot(self.x_center,self.y_center)
+            
             print("x_centroid=", self.x_center)
             print("y_centroid=", self.y_center)
             
@@ -83,21 +85,22 @@ class PersonFollower(Node):
             cv2.imshow('Person Detection', self.cv_image)
             cv2.waitKey(3)
             print("No person detected in the image")
-             
 
+# prev_time= time.now();
+    
 
     def move_robot(self, x_centroid, y_centroid):
         # Assuming your robot moves forward/backward based on x-axis and turns based on y-axis
         Kp_l = 0.09  # Kp
         Kp_a= 0.002  # Kp
-
+        Kd_a=0.005     #Kd
         
         twist_msg = Twist()
 
         if self.depth_mm >= 1.4 :
             x_error = self.x_center - self.image_center  # Calculate the error from the centroid of hooman
             self.depth_mm = self.depth_image[int(self.y_center),int(self.x_center)]
-                
+               
             # Generate Twist message for robot movement
             
             P_x = Kp_l * self.depth_mm
@@ -105,9 +108,13 @@ class PersonFollower(Node):
             twist_msg.linear.x = P_x
 
             P_a = -(Kp_a * x_error)
-            twist_msg.angular.z = P_a
+            
+            D_a=(x_error - self.prev_error)*Kd_a
+            twist_msg.angular.z = P_a+D_a
+            #updating the previous error
+            self.prev_error=x_error
         else:
-            twist_msg.linear.x = 0
+            twist_msg.linear.x = 0.0
         # Publish the Twist message
         self.velocity_publisher.publish(twist_msg)
 
