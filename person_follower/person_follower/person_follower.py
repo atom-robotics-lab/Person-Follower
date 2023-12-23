@@ -7,7 +7,7 @@ from cv_bridge import CvBridge, CvBridgeError
 import cv2
 from sensor_msgs.msg import Image
 import mediapipe as mp
-
+import time
 
 class PersonFollower(Node):
     def __init__(self):
@@ -16,10 +16,11 @@ class PersonFollower(Node):
         self.image_sub = self.create_subscription(Image, "/kinect_camera/image_raw",self.callback, 10) 
         self.depth_sub=self.create_subscription(Image,"/kinect_camera/depth/image_raw",self.depth_callback,10)
         self.velocity_publisher = self.create_publisher(Twist, "/cmd_vel", 10)
-        
+        self.last_error = 0.0
+        self.last_depth = 0.0
         self.velocity_msg = Twist() 
-        self.depth_image = None  
-    
+        self.depth_image = None
+        
 
         self.mp_pose = mp.solutions.pose.Pose(
             min_detection_confidence=0.5,
@@ -82,35 +83,54 @@ class PersonFollower(Node):
             print("y_centroid=", self.y_center)
             
         else:
+            twist_msg = Twist()
+            
             cv2.imshow('Person Detection', self.cv_image)
             cv2.waitKey(3)
             print("No person detected in the image")
-             
+            # twist_msg.angular.z = 1.0
+            # twist_msg.linear.x = 0.0
+            # self.velocity_publisher.publish(twist_msg) 
 
 
     def move_robot(self, x_centroid, y_centroid):
-        # Assuming your robot moves forward/backward based on x-axis and turns based on y-axis
-        Kp_l = 0.099  # Kp
-        Kp_yaw= 0.002  # Kp
-
         
+        Kp_l = 0.7  # Kp
+        Kp_yaw= 0.0073  # Kp
+
+        Kd_yaw = 0.00002 #Kd
+        Kd_l = 0.25
         twist_msg = Twist()
 
+
         if self.depth_mm > 1.5 :
+            #current_time = rclpy.time()
+
             x_error = self.x_center - self.image_center  # Calculate the error from the centroid of hooman
             self.depth_mm = self.depth_image[int(self.y_center),int(self.x_center)]
-                
-            # Generate Twist message for robot movement
             
+            #dt = current_time - prev_time
+                
+            # Proportional Drive
             P_x = Kp_l * self.depth_mm
-            twist_msg.linear.x = P_x
-
+            
             P_yaw = -(Kp_yaw * x_error)
-            twist_msg.angular.z = P_yaw
-    
+
+            # Derivative Drive
+            D_yaw =  ((x_error - self.last_error) / 0.6) * Kd_yaw
+            D_l = ((self.depth_mm - self.last_depth) / 0.6) * Kd_l
+
+
+            self.last_depth = self.depth_mm
+            self.last_error = x_error
+
+            #Publishing twist message
+            twist_msg.angular.z = P_yaw + D_yaw
+            twist_msg.linear.x = P_x + D_l
+
         else:
             twist_msg.linear.x = 0.0
-            
+            twist_msg.angular.z = 0.0
             
         # Publish the Twist message
         self.velocity_publisher.publish(twist_msg)
