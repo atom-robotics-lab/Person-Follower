@@ -57,15 +57,9 @@ class PersonFollower(Node):
             if self.depth_image is not None:
                 self.depth_mm = self.depth_image[int(self.y_center),int(self.x_center)]
                 print("depth is :",self.depth_mm)
-<<<<<<< HEAD
                 print("Person detected in the image")
                 self.move_robot(self.x_center,self.y_center)
                 
-=======
-                self.move_robot(self.x_center,self.y_center)
-
-
->>>>>>> 92f32b95a65c97876e2e09733a415d354df56cd9
             else:
                 self.depth_mm = 0    
             
@@ -84,12 +78,8 @@ class PersonFollower(Node):
 
 
             cv2.waitKey(3)
-<<<<<<< HEAD
-            
-=======
             print("Person detected in the image")
             #self.move_robot(self.x_center,self.y_center)
->>>>>>> 92f32b95a65c97876e2e09733a415d354df56cd9
             print("x_centroid=", self.x_center)
             print("y_centroid=", self.y_center)
             
@@ -99,24 +89,14 @@ class PersonFollower(Node):
             cv2.imshow('Person Detection', self.cv_image)
             cv2.waitKey(3)
             print("No person detected in the image")
-<<<<<<< HEAD
-=======
             # twist_msg.angular.z = 1.0
             # twist_msg.linear.x = 0.0
             # self.velocity_publisher.publish(twist_msg) 
->>>>>>> 92f32b95a65c97876e2e09733a415d354df56cd9
 
 # prev_time= time.now();
     
 
     def move_robot(self, x_centroid, y_centroid):
-<<<<<<< HEAD
-        # Assuming your robot moves forward/backward based on x-axis and turns based on y-axis
-        Kp_l = 0.09  # Kp
-        Kp_a= 0.002  # Kp
-        Kd_a=0.005     #Kd
-=======
->>>>>>> 92f32b95a65c97876e2e09733a415d354df56cd9
         
         Kp_l = 0.7  # Kp
         Kp_yaw= 0.0073  # Kp
@@ -131,11 +111,8 @@ class PersonFollower(Node):
 
             x_error = self.x_center - self.image_center  # Calculate the error from the centroid of hooman
             self.depth_mm = self.depth_image[int(self.y_center),int(self.x_center)]
-<<<<<<< HEAD
                
             # Generate Twist message for robot movement
-=======
->>>>>>> 92f32b95a65c97876e2e09733a415d354df56cd9
             
             #dt = current_time - prev_time
                 
@@ -156,21 +133,14 @@ class PersonFollower(Node):
             twist_msg.angular.z = P_yaw + D_yaw
             twist_msg.linear.x = P_x + D_l
 
-<<<<<<< HEAD
-            P_a = -(Kp_a * x_error)
+            P_a = -(Kp_yaw * x_error)
             
-            D_a=(x_error - self.prev_error)*Kd_a
+            D_a=(x_error - self.prev_error)*Kd_yaw
             twist_msg.angular.z = P_a+D_a
             #updating the previous error
             self.prev_error=x_error
         else:
             twist_msg.linear.x = 0.0
-=======
-        else:
-            twist_msg.linear.x = 0.0
-            twist_msg.angular.z = 0.0
-            
->>>>>>> 92f32b95a65c97876e2e09733a415d354df56cd9
         # Publish the Twist message
         self.velocity_publisher.publish(twist_msg)
 
