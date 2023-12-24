@@ -9,28 +9,24 @@
 
     <gazebo>
         <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
-            <!-- <ros>
-                <namespace>$(arg robot_namespace)</namespace>
+            <ros>
                 <remapping>cmd_vel:=cmd_vel</remapping>
                 <remapping>odom:=odom</remapping>
-            </ros> -->
+            </ros>
             <legacy_mode>false</legacy_mode>
             <update_rate>50.0</update_rate>
             <left_joint>left_motor_joint</left_joint>
             <right_joint>right_motor_joint</right_joint>
             <wheel_separation>0.199</wheel_separation>
-            <wheel_diameter>${2*0.0535}</wheel_diameter>
+            <wheel_diameter>0.1070</wheel_diameter>
             <robot_base_frame>base_link</robot_base_frame>
-            <!-- <max_wheel_torque>${traction_max_wheel_torque}</max_wheel_torque> -->
             <command_topic>cmd_vel</command_topic>
             <odometry_topic>odom</odometry_topic>
             <odometry_frame>odom</odometry_frame>
-            <publish_odom_tf>tf</publish_odom_tf>
+            <tf_topic>tf</tf_topic>
             <publish_wheel_tf>true</publish_wheel_tf>
             <publish_odom>true</publish_odom>
             <max_wheel_acceleration>5.0</max_wheel_acceleration>
-            <!-- Odometry source, 0 for ENCODER, 1 for WORLD, defaults to WORLD -->
-            
         </plugin>
     </gazebo>
     <!-- ........................... CAMERA PLUGIN ................................... -->
@@ -45,12 +41,12 @@
                     <horizontal_fov>1.089</horizontal_fov>
                     <image>
                         <format>R8G8B8</format>
-                        <width>640</width>
-                        <height>480</height>
+                        <width>700</width>
+                        <height>500</height>
                     </image>
                     <clip>
                         <near>0.05</near>
-                        <far>8.0</far>
+                        <far>100.0</far>
                     </clip>
                 </camera>
                 <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
