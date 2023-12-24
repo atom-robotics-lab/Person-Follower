@@ -22,7 +22,8 @@ setup(
         'console_scripts': [
             "camera_subscriber= person_follower.camera_subscriber:main",
             "livefeed_centroid=person_follower.livefeed_centroid:main",
-            "person_follower_py=person_follower.person_follower:main"
+            "person_follower_py=person_follower.person_follower:main",
+            "final_code=final_code.final_code:main"
         ],
     },
 )

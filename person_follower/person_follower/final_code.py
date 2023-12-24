@@ -1,83 +1,84 @@
-import cv2
-import mediapipe as mp
+#! /usr/bin/env python3
 import rclpy
 from rclpy.node import Node
+from geometry_msgs.msg import Twist
+from cv_bridge import CvBridge, CvBridgeError
+import cv2
 from sensor_msgs.msg import Image
-from cv_bridge import CvBridge
+import mediapipe as mp
 
-
-class CameraSubscriber(Node):
+class PersonFollower(Node):
     def __init__(self):
-        super().__init__('camera_subscriber_node')
-        self.bridge = CvBridge()
-        self.subscription = self.create_subscription(
-            Image,'/kinect_camera/image_raw', self.image_callback, 10)
+        super().__init__("person_follower")
+        self.bridge = CvBridge() 
+        self.image_sub = self.create_subscription(Image, "/kinect_camera/image_raw",self.callback, 10) 
+        self.depth_sub=self.create_subscription(Image,"/kinect_camera/depth/image_raw",self.depth_callback,10)
+        self.velocity_msg = Twist() 
+        self.depth_image = None  
     
-    #take webcam feed and display 
-    def calculate_centroid(self,keypoints):
-        x_sum, y_sum = 0, 0
-        num_points = len(keypoints)
-        for point in keypoints:
-            x_sum += point[0]
-            y_sum += point[1]
-        centroid_x = x_sum / num_points
-        centroid_y = y_sum / num_points
-        return [int(centroid_x), int(centroid_y)]
 
-    def webcam_centroid(self,msg):
-            while True:
-                self.cv_image = self.bridge.imgmsg_to_cv2(msg, 'bgr8')
-                mp_holistic = mp.solutions.holistic
-                mp_drawing = mp.solutions.drawing_utils
-                holistic = mp_holistic.Holistic()
-                results = holistic.process(self.cv_image)
-                if results.pose_landmarks:
-                    #keypoints for centroid
-                    keypoints = []
-                    for landmark in results.pose_landmarks.landmark:
-                        h, w, c = self.cv_image.shape
-                        x, y = int(landmark.x * w), int(landmark.y * h)
-                        keypoints.append((x, y))
-                    centroid = self.calculate_centroid(keypoints) #centroid calculation
-                    cv2.circle(self.cv_image, centroid, 5, (0, 255, 0), -1)
-                    mp_drawing.draw_landmarks(self.cv_image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS)
-                cv2.imshow('Kinect Camera Feed', self.cv_image)
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
-            self.cv_image.release()
-            cv2.destroyAllWindows()
+        self.mp_pose = mp.solutions.pose.Pose(
+            min_detection_confidence=0.5,
+            min_tracking_confidence=0.5
+        )
+        
+    def depth_callback(self,data):
+       try:
+            self.depth_image = self.bridge.imgmsg_to_cv2(data, "passthrough")
+       except Exception as e:
+            self.get_logger().error(f"Error converting depth image: {e}")
 
-    def detect_actor_message(self,msg):
-        while True:
-            self.cv_image = self.bridge.imgmsg_to_cv2(msg, 'bgr8')
-            mp_pose = mp.solutions.pose
-            pose = mp_pose.Pose()
-            results = pose.process(self.cv_image)
-            if results.pose_landmarks:
-                #display actor on screen
-                cv2.putText(self.cv_image, "Actor on screen", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-            else:
-                #display Actor not on screen
-                cv2.putText(self.cv_image, "Actor not on screen", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
-            cv2.imshow('Kinect Camera Feed', self.cv_image)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                 break
-        self.cv_image.release()
-        cv2.destroyAllWindows()
 
-    def image_callback(self, msg):
-        self.cv_image = self.bridge.imgmsg_to_cv2(msg, 'bgr8')
-        cv2.imshow('Kinect Camera Feed', self.cv_image)
-        self.webcam_centroid(msg)
-        self.detect_actor_message(msg)
-        cv2.waitKey(1)
+    def callback(self,data):
+        mp_holistic = mp.solutions.holistic
+        holistic = mp_holistic.Holistic()
+        self.cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8") 
+        # self.cv_image= cv2.resize(self.cv_image,(720,600))
+        rgb_cv_image = cv2.cvtColor(self.cv_image, cv2.COLOR_BGR2RGB)
+        self.results = self.mp_pose.process(rgb_cv_image)
+        if self.results.pose_landmarks is not None:
+            landmarks = self.results.pose_landmarks.landmark
+            # Get the average of all landmark x and y coordinates to find the centroid
+            x_centroid = sum([landmark.x for landmark in landmarks]) / len(landmarks)
+            y_centroid = sum([landmark.y for landmark in landmarks]) / len(landmarks)
+            centroid = (x_centroid, y_centroid)
+            self.x_center=x_centroid * self.cv_image.shape[1]
+            self.y_center=y_centroid * self.cv_image.shape[0]
+            x_length=self.cv_image.shape[1]
+            self.image_center=x_length/2
 
-def main(args=None):
-    rclpy.init(args=args)
-    camera_subscriber = CameraSubscriber()
-    rclpy.spin(camera_subscriber)
-    camera_subscriber.destroy_node()
-    rclpy.shutdown()
+            x =int(x_length/2)
+            if self.depth_image is not None:
+                depth_mm = self.depth_image[int(self.y_center),int(self.x_center)]
+                print("depth is :",depth_mm)
 
-if __name__ == "__main__":
-    main()
+            cv2.circle(self.cv_image, (int(x_centroid * self.cv_image.shape[1]), int(y_centroid * self.cv_image.shape[0])), 5, (0, 0, 255), -1)
+
+            x_min = min([landmark.x for landmark in landmarks])
+            x_max = max([landmark.x for landmark in landmarks])
+            y_min = min([landmark.y for landmark in landmarks])
+            y_max = max([landmark.y for landmark in landmarks])
+
+            cv2.rectangle(self.cv_image, (int(x_min * self.cv_image.shape[1]), int(y_min * self.cv_image.shape[0])),
+                          (int(x_max * self.cv_image.shape[1]), int(y_max * self.cv_image.shape[0])), (0, 255, 0), 2)
+            cv2.imshow('Person Detection', self.cv_image)
+            cv2.waitKey(3)
+            print("Person detected in the image")
+            self.results = self.holistic.process(rgb_cv_image)
+            if self.results.segmentation_mask is not None:
+                frame = cv2.cvtColor(cv2.addWeighted(frame, 0.5, cv2.cvtColor(results.segmentation_mask, cv2.COLOR_GRAY2BGR), 0.5, 0), cv2.COLOR_BGR2RGB)
+            cv2.imshow('Live Segmentation', cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
+        else:
+            cv2.imshow('Person Detection', self.cv_image)
+            cv2.waitKey(3)
+            print("No person detected in the image")
+
+def main():
+  rclpy.init()
+  Mynode = PersonFollower()   
+  rclpy.spin(Mynode)
+  cv2.destroyAllWindows()
+  rclpy.shutdown()
+
+if __name__=="__main__" :
+  main()
