@@ -24,34 +24,34 @@
           </waypoint>
 
           <waypoint>
-            <time>3.5</time>
+            <time>5.0</time>
             <pose>5 5 0 0 0 0</pose>
           </waypoint>
 
           <waypoint>
-            <time>4</time>
-            <pose>5 5 0 0 0 -1.57</pose>
+            <time>6.0</time>
+            <pose>6 4 0 0 0 -1.57</pose>
           </waypoint>
 
           <waypoint>
-            <time>7.5</time>
+            <time>11.0</time>
             <pose>5 -5 0 0 0 -1.57</pose>
           </waypoint>
 
           <waypoint>
-            <time>8</time>
-            <pose>5 -5 0 0 0 -3.14</pose>
+            <time>12.0</time>
+            <pose>4 -6 0 0 0 -3.14</pose>
           </waypoint>
           <waypoint>
-            <time>11.5</time>
+            <time>17.0</time>
             <pose>-5 -5 0 0 0 -3.14</pose>
           </waypoint>
           <waypoint>
-            <time>12</time>
-            <pose>-5 -5 0 0 0 -4.71</pose>
+            <time>18.0</time>
+            <pose>-6 -4 0 0 0 -4.71</pose>
           </waypoint>
           <waypoint>
-            <time>15.5</time>
+            <time>23.0</time>
             <pose>-5 5 0 0 0 -4.71</pose>  
           </waypoint>
         </trajectory>

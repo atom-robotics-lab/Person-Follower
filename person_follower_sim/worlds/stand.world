@@ -11,7 +11,7 @@
       <pose>-6 0 0 0 0 0</pose> 
       <skin>
         <filename>stand.dae</filename>
-        <scale>1 </scale>
+        <scale> 1 </scale>
       </skin>
     </actor>
   </world>

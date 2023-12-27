@@ -95,11 +95,12 @@ class PersonFollower(Node):
 
     def move_robot(self, x_centroid, y_centroid):
         
-        Kp_l = 0.7  # Kp
-        Kp_yaw= 0.0073  # Kp
+        Kp_l = 0.58  # Kp
+        Kp_yaw= 0.006  # Kp
 
-        Kd_yaw = 0.00002 #Kd
-        Kd_l = 0.25
+        Kd_yaw = 0.000023 # Kd
+        Kd_l = 0.25 # Kd
+        
         twist_msg = Twist()
 
 

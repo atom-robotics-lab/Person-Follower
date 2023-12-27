@@ -22,7 +22,7 @@ def generate_launch_description():
     gazebo=IncludeLaunchDescription(
         PythonLaunchDescriptionSource([get_package_share_directory('gazebo_ros'), '/launch/gazebo.launch.py']),
         launch_arguments={'pause': 'true',
-                          'world':actor_world1}.items()
+                          'world':actor_world}.items()
     )
 
     #spawn world
