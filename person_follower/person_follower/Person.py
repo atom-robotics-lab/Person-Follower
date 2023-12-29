@@ -28,8 +28,8 @@ class PersonFollower(Node):
             min_detection_confidence=0.1,
             min_tracking_confidence=0.1
         )
-        self.kp_angular=0.001
-        self.kp_linear=1.0
+        self.kp_angular=0.005
+        self.kp_linear=0.7
         self.x_center=None
         self.image_center=None
         self.buffer=10
