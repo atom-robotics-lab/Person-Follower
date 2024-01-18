@@ -2,7 +2,6 @@
 # Person Follower
 This repository focuses on building a ROS2 based Person Follower.
 
-
 ## About the Project
 This project aims to develop a comprehensive ROS2 simulation package tailored for a differential drive robot. The robot will be equipped with person-following capability, leveraging Kinect camera technology for person detection and tracking. The system's primary objective is to enable the robot to autonomously follow individuals, showcasing its potential for practical applications in various domains, including payload transportation and assistance tasks.
 
@@ -73,7 +72,7 @@ ros2 launch person_follower_sim gazebo.launch.py
 ```
 The above command will launch the world as shown below :
 
-insert image of gazebo world
+![image](https://github.com/atom-robotics-lab/Person-Follower/assets/150658457/cee352c9-ea74-4428-887f-4aa06fb4a9a6)
 
 Don't forget to click on the **play** button on the bottom left corner of the Gazebo window.
 
@@ -86,15 +85,17 @@ Now to see the inference results, open a new terminal and enter the given comman
 ```bash
 ros2 run rqt_image_view rqt_image_view
 ```
+![image](https://github.com/atom-robotics-lab/Person-Follower/assets/150658457/bb008b03-2447-4fb1-8023-fb196fda711e)
+
 ## Contributing
 
 We wholeheartedly welcome contributions!  
 They are the driving force that makes the open-source community an extraordinary space for learning, inspiration, and creativity. Your contributions, no matter how big or small, are **genuinely valued** and **highly appreciated**.
 
 1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
+2. Create your Feature Branch (`git checkout -b feature/New-Feature`)
+3. Commit your Changes (`git commit -m 'Add some New-Feature'`)
+4. Push to the Branch (`git push origin feature/New-Feature`)
 5. Open a Pull Request
 
 Please adhere to this project's `code of conduct`.
