@@ -8,6 +8,13 @@ This project aims to develop a comprehensive ROS2 simulation package tailored fo
 
 ### Built With
 
+* [![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
+* [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+* [![ROS 2](https://img.shields.io/badge/ros-%230A0FF9.svg?style=for-the-badge&logo=ros&logoColor=white)](https://www.sphinx-docs.org)
+* [![OpenCV](https://img.shields.io/badge/opencv-%23white.svg?style=for-the-badge&logo=opencv&logoColor=white)](https://opencv.org/)
+* [![MediaPipe](https://img.shields.io/badge/mediapipe-%4285F4.svg?style=for-the-badge&logo=mediapipe&logoColor=white)](https://developers.google.com/mediapipe)
+  
+
 ## Getting started with the project
 Follow these instructions to set up this project on your system.
 
