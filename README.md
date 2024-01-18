@@ -28,6 +28,12 @@ Refer to the official [ROS 2 installation guide](https://docs.ros.org/en/humble/
   ```bash
   pip install opencv-contrib-python
   ```
+* MediaPipe
+  ```bash
+  pip install mediapipe
+  ```
+* Gazebo Classic
+Refer to the official [Gazebo installation guide](https://classic.gazebosim.org/tutorials?cat=guided_b&tut=guided_b1)
 
 ### Installation
 
