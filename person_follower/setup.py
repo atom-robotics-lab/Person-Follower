@@ -21,7 +21,8 @@ setup(
     entry_points={
         'console_scripts': [
             "person_follower_py=person_follower.person_follower:main",
-            "Person=person_follower.Person:main"
+            "Person=person_follower.Person:main",
+            "Person_follower_IS=person_follower.Person_follower_IS:main"
         ],
     },
 )

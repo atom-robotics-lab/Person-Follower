@@ -1,13 +1,16 @@
+
 #! /usr/bin/env python3
 
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
-from cv_bridge import CvBridge, CvBridgeError
+from cv_bridge import CvBridge
 import cv2
 from sensor_msgs.msg import Image
 import mediapipe as mp
-
+from mediapipe.tasks import python
+from mediapipe.tasks.python import vision
+import numpy as np
 
 class PersonFollower(Node):
     def __init__(self):
@@ -33,6 +36,16 @@ class PersonFollower(Node):
         self.x_center=None
         self.image_center=None
         self.buffer=10
+
+        
+        # Create the options that will be used for ImageSegmenter
+        base_options = python.BaseOptions(model_asset_path='/home/aakshar/person_follower_ws/src/Person-Follower/person_follower/person_follower/deeplabv3.tflite')
+        options = vision.ImageSegmenterOptions(base_options=base_options,output_category_mask=True)
+        self.segmenter = vision.ImageSegmenter.create_from_options(options)
+
+        self.BG_COLOR = (192, 192, 192) # gray
+        self.MASK_COLOR = (0, 255, 0) # white
+
         
     
     def depth_callback(self,data):
@@ -44,6 +57,7 @@ class PersonFollower(Node):
 
     def callback(self,data):
         self.cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8") 
+        self.segmentation_frame=self.cv_image
         rgb_cv_image = cv2.cvtColor(self.cv_image, cv2.COLOR_BGR2RGB)
         self.results = self.mp_pose.process(rgb_cv_image)
         if self.results.pose_landmarks is not None:
@@ -56,6 +70,8 @@ class PersonFollower(Node):
             x_length=self.cv_image.shape[1]
             self.image_center=x_length/2
 
+            self.segmentation_frame = mp.Image(image_format=mp.ImageFormat.SRGB, data=self.segmentation_frame)
+
             x =int(x_length/2)
             # if self.depth_image is not None:
             #     depth_mm = self.depth_image[int(y_center),int(x_center)]
@@ -66,7 +82,7 @@ class PersonFollower(Node):
             #         self.velocity_control(0.0,0.0)
 
 
-            cv2.circle(self.cv_image, (int(x_centroid * self.cv_image.shape[1]), int(y_centroid * self.cv_image.shape[0])), 5, (0, 0, 255), -1)
+            cv2.circle(self.cv_image, (int(self.x_center), int(self.y_center)), 5, (0, 0, 255), -1)
             # print("value of x_centroid",self.cv_image.shape[1] * x_centroid)
             # print("value of y_centroid",self.cv_image.shape[0] * y_centroid)
 
@@ -77,6 +93,21 @@ class PersonFollower(Node):
 
             cv2.rectangle(self.cv_image, (int(x_min * self.cv_image.shape[1]), int(y_min * self.cv_image.shape[0])),
                           (int(x_max * self.cv_image.shape[1]), int(y_max * self.cv_image.shape[0])), (0, 255, 0), 2)
+            
+                # Retrieve the masks for the segmented image
+            segmentation_result = self.segmenter.segment(self.segmentation_frame)
+            category_mask = segmentation_result.category_mask
+
+            image_data = self.segmentation_frame.numpy_view()
+            fg_image = np.zeros(image_data.shape, dtype=np.uint8)
+            fg_image[:] = self.MASK_COLOR
+            bg_image = np.zeros(image_data.shape, dtype=np.uint8)
+            bg_image[:] = self.BG_COLOR
+            
+            condition = np.stack((category_mask.numpy_view(),) * 3, axis=-1) > 0.2
+
+            self.segmentation_frame = np.where(condition, fg_image, bg_image)
+
         self.control_loop()
     
     def control_loop(self):        
@@ -127,6 +158,7 @@ class PersonFollower(Node):
         cv2.putText(self.cv_image,self.top,(200,50),cv2.FONT_HERSHEY_DUPLEX,0.8,(0, 0,255),2)    
         cv2.putText(self.cv_image,self.bottom,(200,450),cv2.FONT_HERSHEY_DUPLEX,0.8,(0, 0, 255),2)                      
         cv2.imshow('Person Detection', self.cv_image)
+        cv2.imshow("person Segmenter",self.segmentation_frame)
         cv2.waitKey(3)
             
 
@@ -146,5 +178,3 @@ def main():
 
 if __name__=="__main__" :
   main()
-
-

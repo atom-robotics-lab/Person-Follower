@@ -63,7 +63,7 @@ class PersonFollower(Node):
                 self.depth_mm = 0    
             
 
-            cv2.circle(self.cv_image, (int(x_centroid * self.cv_image.shape[1]), int(y_centroid * self.cv_image.shape[0])), 5, (0, 0, 255), -1)
+            cv2.circle(self.cv_image, (int(x_centroid * self.cv_image.shape[1]), int(self.y_center)), 5, (0, 0, 255), -1)
 
             x_min = min([landmark.x for landmark in landmarks])
             x_max = max([landmark.x for landmark in landmarks])
@@ -72,7 +72,7 @@ class PersonFollower(Node):
 
             cv2.rectangle(self.cv_image, (int(x_min * self.cv_image.shape[1]), int(y_min * self.cv_image.shape[0])),
                           (int(x_max * self.cv_image.shape[1]), int(y_max * self.cv_image.shape[0])), (0, 255, 0), 2)
-            self.mp_drawing.draw_landmarks(self.cv_image, self.results.pose_landmarks)
+            # self.mp_drawing.draw_landmarks(self.cv_image, self.results.pose_landmarks)
             cv2.imshow('Person Detection', self.cv_image)
 
 
