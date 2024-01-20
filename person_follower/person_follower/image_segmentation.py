@@ -34,36 +34,34 @@ class ImageSegmentationNode(Node):
 
             # Retrieve the masks for the segmented image
             segmentation_result = self.segmenter.segment(image)
-            category_mask = segmentation_result.category_mask
+            #category_mask = segmentation_result.category_mask
 
-            # Generate solid color images for showing the output segmentation mask.
-            image_data = image.numpy_view()
-            fg_image = np.zeros(image_data.shape, dtype=np.uint8)
-            fg_image[:] = MASK_COLOR
-            bg_image = np.zeros(image_data.shape, dtype=np.uint8)
-            bg_image[:] = BG_COLOR
+            # # Generate solid color images for showing the output segmentation mask.
+            # image_data = image.numpy_view()
+            # fg_image = np.zeros(image_data.shape, dtype=np.uint8)
+            # fg_image[:] = MASK_COLOR
+            # bg_image = np.zeros(image_data.shape, dtype=np.uint8)
+            # bg_image[:] = BG_COLOR
 
-            condition = np.stack((category_mask.numpy_view(),) * 3, axis=-1) > 0.2
-            output_image = np.where(condition, fg_image, bg_image)
+            # condition = np.stack((category_mask.numpy_view(),) * 3, axis=-1) > 0.2
+            # output_image = np.where(condition, fg_image, bg_image)
 
             # Display the original and segmented images
-            cv2.imshow('Original Image', cv_image)
-            cv2.imshow('Segmented Image', cv2.cvtColor(output_image, cv2.COLOR_RGB2BGR))
+            cv2.imshow('Original Image', segmentation_result)
+            # cv2.imshow('Segmented Image', cv2.cvtColor(output_image, cv2.COLOR_RGB2BGR))
             cv2.waitKey(1)
 
         except Exception as e:
             self.get_logger().error(f"Error in image_callback: {str(e)}")
 
 
-def main(args=None):
-    rclpy.init(args=args)
+def main():
+    rclpy.init()
     node = ImageSegmentationNode()
     rclpy.spin(node)
-    node.destroy_node()
+    cv2.destroyAllWindows()
     rclpy.shutdown()
 
 
 if __name__ == '__main__':
     main()
-
-
