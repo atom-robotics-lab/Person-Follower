@@ -111,9 +111,9 @@ class PersonFollower(Node):
 
             if self.results.pose_landmarks is not None:
                 cv2.line(self.cv_image, (int(self.x_center-15), int(self.y_center)), (int(self.x_center+15), int(self.y_center)), (255, 0, 0), 3) 
-                cv2.line(self.cv_image, (int(self.x_center), int(self.y_center-10)), (int(self.x_center), int(self.y_center+15)), (255, 0, 0), 3)
+                cv2.line(self.cv_image, (int(self.x_center), int(self.y_center-15)), (int(self.x_center), int(self.y_center+15)), (255, 0, 0), 3)
                 cv2.line(self.segmentation_frame, (int(self.x_center-15), int(self.y_center)), (int(self.x_center+15), int(self.y_center)), (255, 0, 0), 3) 
-                cv2.line(self.segmentation_frame, (int(self.x_center), int(self.y_center-10)), (int(self.x_center), int(self.y_center+15)), (255, 0, 0), 3)
+                cv2.line(self.segmentation_frame, (int(self.x_center), int(self.y_center-15)), (int(self.x_center), int(self.y_center+15)), (255, 0, 0), 3)
                 cv2.line(self.segmentation_frame, (int(350), int(0)), (int(350), int(500)), (0, 0, 255), 2) 
                 cv2.line(self.segmentation_frame, (int(0), int(self.y_center)), (int(700), int(self.y_center)), (0, 0, 255), 2)
                 
