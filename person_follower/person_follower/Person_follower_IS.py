@@ -1,4 +1,3 @@
-
 #! /usr/bin/env python3
 
 import rclpy
@@ -36,8 +35,8 @@ class PersonFollower(Node):
         self.x_center=None
         self.image_center=None
         self.buffer=10
-
-        
+        self.mp_drawing = mp.solutions.drawing_utils
+        self.mp_holistic = mp.solutions.holistic
         # Create the options that will be used for ImageSegmenter
         base_options = python.BaseOptions(model_asset_path='/home/aakshar/person_follower_ws/src/Person-Follower/person_follower/person_follower/deeplabv3.tflite')
         options = vision.ImageSegmenterOptions(base_options=base_options,output_category_mask=True)
@@ -69,6 +68,7 @@ class PersonFollower(Node):
             self.y_center=y_centroid * self.cv_image.shape[0]
             x_length=self.cv_image.shape[1]
             self.image_center=x_length/2
+            
 
             self.segmentation_frame = mp.Image(image_format=mp.ImageFormat.SRGB, data=self.segmentation_frame)
 
@@ -107,6 +107,7 @@ class PersonFollower(Node):
             condition = np.stack((category_mask.numpy_view(),) * 3, axis=-1) > 0.2
 
             self.segmentation_frame = np.where(condition, fg_image, bg_image)
+            self.mp_drawing.draw_landmarks(self.segmentation_frame, self.results.pose_landmarks,self.mp_holistic.POSE_CONNECTIONS)
 
         self.control_loop()
     
