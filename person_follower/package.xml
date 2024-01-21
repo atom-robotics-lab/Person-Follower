@@ -3,9 +3,9 @@
 <package format="3">
   <name>person_follower</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="pragya@todo.todo">pragya</maintainer>
-  <license>TODO: License declaration</license>
+  <description>person_follower_sim</description>
+  <maintainer email="abhishekgarg7077@gmail.com">Abhishek Garg</maintainer>
+  <license>Apache License 2.0</license>
 
   <depend>rclpy</depend>
   <depend>sensor_msgs</depend>
