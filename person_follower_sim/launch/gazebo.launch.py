@@ -33,6 +33,7 @@ def generate_launch_description():
         output='screen',
         arguments=['-entity', 'first_world', '-file', my_pkg_dir],
     )
+
     #publishing robot_state into topic robot_description
     robot_state=Node(package = 'robot_state_publisher',
                             executable = 'robot_state_publisher',
@@ -44,20 +45,22 @@ def generate_launch_description():
                                         # ' camera_enabled:=', camera_enabled,
                                         ]), value_type=str)}]
                             )
-    #swawn mr_robot using the topic "/mr_robot_description"
+    
+    #spawn mr_robot using the topic "/mr_robot_description"
     robot_spawn=Node(
         package='gazebo_ros',
         executable='spawn_entity.py',
         name='spawn_mr_robot',
         output='screen',
         arguments=[
-    '-entity', 'mr_robot',
-    '-topic', '/robot_description',
-    '-x', '8.0',  # Set the initial X position
-    '-y', '2.0',  # Set the initial Y position
-    '-z', '0.0' ,  # Set the initial Z position
-    '-Y', '-3.14'   # Set the initial Z position
-]
+                    '-entity', 'mr_robot',
+                    '-topic', '/robot_description',
+                    '-x', '8.0',  # Set the initial X position
+                    '-y', '2.0',  # Set the initial Y position
+                    '-z', '0.0' ,  # Set the initial Z position
+                    '-Y', '-3.14'   # Set the initial Z position
+    ]
+
     )
     return LaunchDescription([
         gazebo,
