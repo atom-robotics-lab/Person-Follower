@@ -22,7 +22,7 @@ def generate_launch_description():
     gazebo=IncludeLaunchDescription(
         PythonLaunchDescriptionSource([get_package_share_directory('gazebo_ros'), '/launch/gazebo.launch.py']),
         launch_arguments={'pause': 'true',
-                          'world':actor_world}.items()
+                          'world':actor_world1}.items()
     )
 
     #spawn world
@@ -53,10 +53,10 @@ def generate_launch_description():
         arguments=[
     '-entity', 'mr_robot',
     '-topic', '/robot_description',
-    '-x', '8.0',  # Set the initial X position
-    '-y', '-8.0',  # Set the initial Y position
+    '-x', '-8.0',  # Set the initial X position
+    '-y', '8.0',  # Set the initial Y position
     '-z', '0.0' ,  # Set the initial Z position
-    '-Y', '-3.14'   # Set the initial Z position
+    '-Y', '0.0'   # Set the initial Z position
 ]
     )
     return LaunchDescription([
