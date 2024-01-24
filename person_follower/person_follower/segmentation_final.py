@@ -18,7 +18,7 @@ class PersonFollower(Node):
         self.image_sub = self.create_subscription(Image, "/kinect_camera/image_raw",self.callback, 10) 
         self.depth_sub=self.create_subscription(Image,"/kinect_camera/depth/image_raw",self.depth_callback,10)
         self.pub = self.create_publisher(Twist, '/cmd_vel', 10)
-        self.velocity_msg = Twist() 
+        self.velocity_msg = Twist()
         self.depth_image = None
         self.velocity_msg.linear.y = 0.0
         self.velocity_msg.linear.z = 0.0
@@ -58,6 +58,7 @@ class PersonFollower(Node):
         rgb_cv_image = cv2.cvtColor(self.cv_image, cv2.COLOR_BGR2RGB)
         self.segmentation_frame=self.cv_image
         self.results = self.mp_pose.process(rgb_cv_image)
+        
         if self.results.pose_landmarks is not None:
             landmarks = self.results.pose_landmarks.landmark
             # Get the average of all landmark x and y coordinates to find the centroid
@@ -68,7 +69,7 @@ class PersonFollower(Node):
             self.y_center=y_centroid * self.cv_image.shape[0]
             x_length=self.cv_image.shape[1]
             self.image_center=x_length/2
-
+            
             x =int(x_length/2)
             # if self.depth_image is not None:
             #     depth_mm = self.depth_image[int(self.y_center),int(self.x_center)]
@@ -83,7 +84,8 @@ class PersonFollower(Node):
 
             cv2.rectangle(self.cv_image, (int(x_min * self.cv_image.shape[1]), int(y_min * self.cv_image.shape[0])),
                           (int(x_max * self.cv_image.shape[1]), int(y_max * self.cv_image.shape[0])), (0, 255, 0), 2)
-            #mask for the segmented image
+            self.segmentation_frame = mp.Image(image_format=mp.ImageFormat.SRGB, data=self.segmentation_frame)
+            # mask for the segmented image
             segmentation_result = self.segmenter.segment(self.segmentation_frame)
             category_mask = segmentation_result.category_mask
 
@@ -157,6 +159,7 @@ class PersonFollower(Node):
         cv2.putText(self.cv_image,self.top,(200,50),cv2.FONT_HERSHEY_DUPLEX,0.8,(0, 0,255),2)    
         cv2.putText(self.cv_image,self.bottom,(200,450),cv2.FONT_HERSHEY_DUPLEX,0.8,(0, 0, 255),2)                      
         cv2.imshow('Person Detection', self.cv_image)
+        cv2.imshow('Person Segmentation', self.segmentation_frame)
         cv2.waitKey(3)
         print("No person detected in the image")
 
