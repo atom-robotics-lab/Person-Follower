@@ -3,7 +3,10 @@
 This repository focuses on building a ROS2 based Person Follower.
 
 ## About the Project
-This project aims to develop a comprehensive ROS2 simulation package tailored for a differential drive robot. The robot will be equipped with person-following capability, leveraging Kinect camera technology for person detection and tracking. The system's primary objective is to enable the robot to autonomously follow individuals, showcasing its potential for practical applications in various domains, including payload transportation and assistance tasks.
+This project aims to develop a comprehensive ROS2 simulation package tailored for a differential drive robot. The robot will be equipped with person-following capability, leveraging Kinect camera technology for person detection and tracking. The system's primary objective is to enable the robot to autonomously follow individuals, showcasing its potential for practical applications in various domains, including payload transportation and assistance tasks.  
+
+![person_follower](https://github.com/atom-robotics-lab/Person-Follower/assets/150658457/4f204124-6957-4d9c-adfa-f59beb9baf33)
+
 
 ### Built With
 
@@ -32,7 +35,8 @@ Refer to the official [ROS 2 installation guide](https://docs.ros.org/en/humble/
   pip install mediapipe
   ```
 * Gazebo Classic
-Refer to the official [Gazebo installation guide](https://classic.gazebosim.org/tutorials?cat=guided_b&tut=guided_b1)
+Refer to the![Uploading person_follower.gif…]()
+ official [Gazebo installation guide](https://classic.gazebosim.org/tutorials?cat=guided_b&tut=guided_b1)
 
 ### Installation
 
