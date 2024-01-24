@@ -79,7 +79,7 @@ class PersonFollower(Node):
 
             # Display the image
             cv2.imshow('Person Detection', self.cv_image)
-            cv2.waitKey(300)
+            cv2.waitKey(3)
 
         else: # No Person Detected
 
@@ -109,14 +109,14 @@ class PersonFollower(Node):
     def move_robot(self):
         # Constants for PD controller
         Kp_l = 0.58
-        Kp_yaw = 0.0045
-        Kd_yaw = 0.0008
+        Kp_yaw = 0.005
+        Kd_yaw = 0.00265
         Kd_l = 0.25
 
         # Calculating the error
         x_error = self.x_center - self.image_center
 
-        if self.depth_mm > 3:
+        if self.depth_mm > 1.5:
 
             # Determine the direction to move based on the person's position
             if x_error > 10:
@@ -154,7 +154,7 @@ class PersonFollower(Node):
     def limiting_loop(self):
         if self.x_center > 700:
                 self.x_center=699.0
-        if self.y_center> 500:
+        if self.y_center > 500:
                 self.y_center=499.0
     
     def vel_control(self, vel_x, vel_spin):
