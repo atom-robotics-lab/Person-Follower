@@ -159,13 +159,13 @@ class PersonFollower(Node):
 
     def move_robot(self):
         # Constants for PD controller
-        Kp_l = 0.58
+        Kp_l = 0.48
         Kp_yaw = 0.0045
         Kd_yaw = 0.0008
         Kd_l = 0.25
 
         # Calculating the error
-        x_error = self.x_center - self.image_center
+        x_error = self.x_center - self.image_center -3.0
 
         if self.depth_mm > 3:
 
