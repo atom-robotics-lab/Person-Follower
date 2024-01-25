@@ -20,10 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            "person_follower_py=person_follower.person_follower:main",
-            "Person=person_follower.Person:main",
-            "Person_follower_IS=person_follower.Person_follower_IS:main",
-            "final_code=person_follower.final_code:main"
+            "final_person_follower=final_person_follower.final_person_follower:main"
         ],
     },
 )
